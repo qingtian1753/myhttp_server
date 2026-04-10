@@ -9,7 +9,7 @@ void Log::log(LogLevel level,const char* file,int line,const std::string& msg)
     //(但其实也没有判断的必要，用cout也行，只是我觉得用cerr输出错误会更规范)
     std::ostream& out =(level == LogLevel::error ? std::cerr : std::cout);
     out<<"["<<getCurrentTime()<<"] "
-        <<levelToString(level)
+       <<"["<<levelToString(level)<<"]"
        <<"["<<file<<":"<<line<<"] "
        <<msg<<"\n";
 }
@@ -17,11 +17,11 @@ std::string Log::levelToString(LogLevel level)
 {
     switch (level)
     {
-        case LogLevel::debug : return "[DEBUG]";
-        case LogLevel::info  : return "[INFO]";
-        case LogLevel::warn  : return "[WARN]";
-        case LogLevel::error : return "[ERROR]";
-        default              : return "[UNKNOWN]";
+        case LogLevel::debug : return "DEBUG";
+        case LogLevel::info  : return "INFO";
+        case LogLevel::warn  : return "WARN";
+        case LogLevel::error : return "ERROR";
+        default              : return "UNKNOWN";
     }
 }
 

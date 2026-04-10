@@ -42,7 +42,11 @@ bool Database::userExists(const std::string& username, bool& exists)
 
     const char* sql = "SELECT id FROM users WHERE username = ? LIMIT 1";
     MYSQL_STMT* stmt = mysql_stmt_init(conn_);
-    if (!stmt) return false;
+    if (!stmt)
+    {
+        LOG_ERROR("mysql_stmt_init failed! ");
+        return false;
+    }
 
     if (mysql_stmt_prepare(stmt, sql, std::strlen(sql)) != 0) {
         LOG_ERROR(std::string("mysql_stmt_prepare failed: ") + mysql_stmt_error(stmt));
