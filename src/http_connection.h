@@ -25,9 +25,10 @@ struct HttpConnection {
         writeBuffer.clear();
         writePos = 0;
     }
-
+    
+    //全部发完返回true
     bool hasPendingOutput() const {
-        return !writeBuffer.empty() || !writeQueue.empty();
+        return writeBuffer.empty() && writeQueue.empty();
     }
 
     void loadOneMessage() {

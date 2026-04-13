@@ -12,12 +12,12 @@ public:
     explicit HttpServer(int port, std::string wwwRoot = "./www", int maxEvents = 1024);
     ~HttpServer();
 
-    bool init();
+    bool init(const std::string& host,const std::string& owner_name,const std::string& password,const std::string& database_name,int port);
     void run();
 
 private:
     bool createListenSocket();
-    bool initDatabase();
+    bool initDatabase(const std::string& host,const std::string& owner_name,const std::string& password,const std::string& database_name,int port);
 
     void handleAccept();
     void handleReadEvent(int fd);

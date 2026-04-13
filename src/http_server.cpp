@@ -17,10 +17,10 @@ HttpServer::HttpServer(int port, std::string wwwRoot, int maxEvents)
 
 HttpServer::~HttpServer() = default;
 
-bool HttpServer::init()
+bool HttpServer::init(const std::string& host,const std::string& owner_name,const std::string& password,const std::string& database_name,int port)
 {
-    if (!createListenSocket()) return false;
-    if (!initDatabase()) return false;
+    if (!createListenSocket() || !initDatabase(host, owner_name, password, database_name, port)) 
+        return false;
 
     if (!epoll_.addFd(listenFd_.getfd())) {
         LOG_ERROR("add listen fd to epoll failed");
@@ -36,6 +36,7 @@ bool HttpServer::createListenSocket()
         LOG_ERROR("socket create failed");
         return false;
     }
+        
 
     int reuse = 1;
     if (setsockopt(fd.getfd(), SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse)) == -1) {
@@ -63,10 +64,10 @@ bool HttpServer::createListenSocket()
     return true;
 }
 
-
-bool HttpServer::initDatabase()
+//连接数据库                     //
+bool HttpServer::initDatabase(const std::string& host,const std::string& owner_name,const std::string& password,const std::string& database_name,int port)
 {
-    if (!db_.connect("127.0.0.1", "qingtian@localhost", "hukai823", "myserver", 3306)) {
+    if (!db_.connect(host, owner_name, password, database_name, port)) {
         LOG_WARN("database connect failed, API register/login will not work");
         return false;
     }
@@ -294,7 +295,8 @@ void HttpServer::flushOneClient(int fd)
     if (!client) return;
 
     while (true) {
-        if (!client->hasPendingOutput()) {
+        //判断是否发完,发完则进入if判断连接状态来决定是否要保持连接
+        if (client->hasPendingOutput()) {
             if (client->keepAlive) {
                 epoll_.modEpollToRead(fd);
             } else {
@@ -306,9 +308,11 @@ void HttpServer::flushOneClient(int fd)
         client->loadOneMessage();
         size_t& pos = client->writePos;
         std::string& msg = client->writeBuffer;
-        while (pos < msg.size()) {
+        while (pos < msg.size()) 
+        {
             ssize_t bytesSend = ::send(fd, msg.data() + pos, msg.size() - pos, 0);
-            if (bytesSend > 0) {
+            if (bytesSend > 0) 
+            {
                 pos += static_cast<size_t>(bytesSend);
                 continue;
             }
@@ -328,6 +332,7 @@ void HttpServer::closeClient(int fd)
     auto it = clients_.find(fd);
     if (it == clients_.end()) return;
     epoll_.delFd(fd);
+    //unordered_map<>擦除时会调用类的析构函数
     clients_.erase(it);
     LOG_INFO("client fd=" + std::to_string(fd) + " closed");
 }

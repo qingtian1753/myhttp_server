@@ -11,11 +11,13 @@ bool Database::connect(const std::string& host,
                        const std::string& dbname,
                        unsigned int port)
 {
+    //分配并初始化一个mysql结构体，可以传入MYSQL指针来重用它，传入nullptr则是动态分配
     conn_ = mysql_init(nullptr);
     if (!conn_) {
         LOG_ERROR("mysql_init failed");
         return false;
     }
+    //将这个结构体连接到数据库
     if (!mysql_real_connect(conn_, host.c_str(), user.c_str(), password.c_str(), dbname.c_str(), port, nullptr, 0)) {
         LOG_ERROR(std::string("mysql_real_connect failed: ") + mysql_error(conn_));
         mysql_close(conn_);
@@ -41,19 +43,22 @@ bool Database::userExists(const std::string& username, bool& exists)
     if (!conn_) return false;
 
     const char* sql = "SELECT id FROM users WHERE username = ? LIMIT 1";
+
+    //初始化一个语句句柄
     MYSQL_STMT* stmt = mysql_stmt_init(conn_);
     if (!stmt)
     {
         LOG_ERROR("mysql_stmt_init failed! ");
         return false;
     }
-
+    //将sql语句发送到mysql服务端进行预编译
     if (mysql_stmt_prepare(stmt, sql, std::strlen(sql)) != 0) {
         LOG_ERROR(std::string("mysql_stmt_prepare failed: ") + mysql_stmt_error(stmt));
         mysql_stmt_close(stmt);
         return false;
     }
 
+    //创建参数
     MYSQL_BIND param[1]{};
     unsigned long usernameLen = static_cast<unsigned long>(username.size());
     param[0].buffer_type = MYSQL_TYPE_STRING;
@@ -61,17 +66,19 @@ bool Database::userExists(const std::string& username, bool& exists)
     param[0].buffer_length = usernameLen;
     param[0].length = &usernameLen;
 
+    //将参数绑定到stmt
     if (mysql_stmt_bind_param(stmt, param) != 0) {
         LOG_ERROR(std::string("mysql_stmt_bind_param failed: ") + mysql_stmt_error(stmt));
         mysql_stmt_close(stmt);
         return false;
     }
+    //执行sql语句
     if (mysql_stmt_execute(stmt) != 0) {
         LOG_ERROR(std::string("mysql_stmt_execute failed: ") + mysql_stmt_error(stmt));
         mysql_stmt_close(stmt);
         return false;
     }
-
+    
     int id = 0;
     unsigned long idLen = 0;
     bool isNull = false;
@@ -82,17 +89,20 @@ bool Database::userExists(const std::string& username, bool& exists)
     result[0].length = &idLen;
     result[0].is_null = &isNull;
 
+    //执行成功再通过result获得返回结果，先绑定结果
     if (mysql_stmt_bind_result(stmt, result) != 0) {
         LOG_ERROR(std::string("mysql_stmt_bind_result failed: ") + mysql_stmt_error(stmt));
         mysql_stmt_close(stmt);
         return false;
     }
+    //将结果拿出来
     if (mysql_stmt_store_result(stmt) != 0) {
         LOG_ERROR(std::string("mysql_stmt_store_result failed: ") + mysql_stmt_error(stmt));
         mysql_stmt_close(stmt);
         return false;
     }
-
+    
+    //逐行获取，没有行时返回1，有则是0
     int fetchResult = mysql_stmt_fetch(stmt);
     exists = (fetchResult == 0);
     mysql_stmt_free_result(stmt);

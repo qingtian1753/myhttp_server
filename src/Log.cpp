@@ -6,7 +6,7 @@
 void Log::log(LogLevel level,const char* file,int line,const std::string& msg)
 {
     //判断输出方式，如果是错误的话就要cerr，这样输出会立即刷新缓冲区，立即输出
-    //(但其实也没有判断的必要，用cout也行，只是我觉得用cerr输出错误会更规范)
+    //(但其实用cout也行，只是我觉得用cerr输出错误会更规范)
     std::ostream& out =(level == LogLevel::error ? std::cerr : std::cout);
     out<<"["<<getCurrentTime()<<"] "
        <<"["<<levelToString(level)<<"]"
@@ -31,7 +31,7 @@ std::string Log::getCurrentTime()
     std::time_t now = time(nullptr);
     //本地时间结构体，用来存放本地时间
     std::tm localtime{};
-
+    
     //POSIX系统下用这个函数计算出本地时间并存储到localtime里
     //时间为UTC时间，比我东八区的时间少8小时，可以修改系统配置来解决
     //sudo timedatectl set-timezone Asia/Shanghai 设置时间为上海时区
