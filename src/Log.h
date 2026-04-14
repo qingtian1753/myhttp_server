@@ -1,3 +1,4 @@
+#pragma once
 #include <iostream>
 #include <functional>
 //三种等级

@@ -6,6 +6,7 @@
 #include "http_request.h"
 #include "database.h"
 
+class Epoll;
 namespace route {
     using Handler = std::function<void(HttpConnection&, const HttpRequest&, Database&)>;
 
@@ -21,4 +22,6 @@ namespace route {
     bool parseFormBody(const std::string& body, std::unordered_map<std::string, std::string>& form);
     std::string simpleHash(const std::string& input);
     std::string escapeJson(const std::string& s);
+    // void enqueueResponse(HttpConnection& client,std::string&& msg);
+    
 }

@@ -17,7 +17,7 @@ HttpServer::HttpServer(int port, std::string wwwRoot, int maxEvents)
 
 HttpServer::~HttpServer() = default;
 
-bool HttpServer::init(const std::string& host,const std::string& owner_name,const std::string& password,const std::string& database_name,int port)
+bool HttpServer::init(const std::string& host,const std::string& owner_name,const std::string& password,const std::string& database_name,const int& port)
 {
     if (!createListenSocket() || !initDatabase(host, owner_name, password, database_name, port)) 
         return false;
@@ -48,7 +48,6 @@ bool HttpServer::createListenSocket()
     sa.sin_family = AF_INET;
     sa.sin_port = htons(port_);
     sa.sin_addr.s_addr = htonl(INADDR_ANY);
-
     if (bind(fd.getfd(), reinterpret_cast<sockaddr*>(&sa), sizeof(sa)) == -1 ||
         listen(fd.getfd(), 256) == -1) {
         LOG_ERROR("bind or listen failed");
@@ -61,10 +60,11 @@ bool HttpServer::createListenSocket()
     }
 
     listenFd_ = std::move(fd);
+    LOG_INFO("http server started on port=" + std::to_string(port_));
     return true;
 }
 
-//连接数据库                     //
+//连接数据库                 
 bool HttpServer::initDatabase(const std::string& host,const std::string& owner_name,const std::string& password,const std::string& database_name,int port)
 {
     if (!db_.connect(host, owner_name, password, database_name, port)) {
@@ -151,6 +151,13 @@ void HttpServer::recvAll(int fd)
 {
     HttpConnection* client = findClient(fd);
     if (!client) return;
+    //如果是慢客户发来的请求，直接关闭(慢客户端指的是一直发请求，但是又不接收数据导致服务器的数据一直发不出去，堆积在消息队列里，占用服务器内存)
+    if(client->ifSlow())
+    {
+        LOG_WARN("the slow client is closed!");
+        closeClient(fd);
+        return ;
+    }
 
     while (true) {
         char buffer[4096];
@@ -167,6 +174,7 @@ void HttpServer::recvAll(int fd)
         }
         if (errno == EINTR) continue;
         if (errno == EAGAIN || errno == EWOULDBLOCK) break;
+
         LOG_WARN("recv failed, closing client fd=" + std::to_string(fd));
         closeClient(fd);
         return;
@@ -293,10 +301,9 @@ void HttpServer::flushOneClient(int fd)
 {
     HttpConnection* client = findClient(fd);
     if (!client) return;
-
     while (true) {
         //判断是否发完,发完则进入if判断连接状态来决定是否要保持连接
-        if (client->hasPendingOutput()) {
+        if (client->isOutEmpty()) {
             if (client->keepAlive) {
                 epoll_.modEpollToRead(fd);
             } else {
@@ -313,6 +320,7 @@ void HttpServer::flushOneClient(int fd)
             ssize_t bytesSend = ::send(fd, msg.data() + pos, msg.size() - pos, 0);
             if (bytesSend > 0) 
             {
+                client->storedBytes-=static_cast<size_t>(bytesSend);
                 pos += static_cast<size_t>(bytesSend);
                 continue;
             }
@@ -327,13 +335,15 @@ void HttpServer::flushOneClient(int fd)
     }
 }
 
+
+
 void HttpServer::closeClient(int fd)
 {
-    auto it = clients_.find(fd);
-    if (it == clients_.end()) return;
+    auto it =clients_.find(fd);
+    if(it == clients_.end())
+        return ;
     epoll_.delFd(fd);
     //unordered_map<>擦除时会调用类的析构函数
     clients_.erase(it);
     LOG_INFO("client fd=" + std::to_string(fd) + " closed");
 }
-

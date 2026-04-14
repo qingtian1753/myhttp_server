@@ -12,7 +12,7 @@ public:
     explicit HttpServer(int port, std::string wwwRoot = "./www", int maxEvents = 1024);
     ~HttpServer();
 
-    bool init(const std::string& host,const std::string& owner_name,const std::string& password,const std::string& database_name,int port);
+    bool init(const std::string& host,const std::string& owner_name,const std::string& password,const std::string& database_name,const int& port);
     void run();
 
 private:

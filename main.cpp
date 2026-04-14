@@ -5,25 +5,23 @@
 int main(int argc, char* argv[])
 {
     int port = 8080;
-    if(argc != 5)
+    if(argc != 6)
     {
-        LOG_ERROR("usage<port><databaseUserName><password><databaseName>!");
+        LOG_ERROR("usage<host><databaseUserName><password><databaseName><listen port>!");
         return 1;
     }
     try{
-        port = std::atoi(argv[1]);
-    }catch(const std::invalid_argument& ia){
-            LOG_ERROR("port is invaild_argument");
-            return 1;
-        };
-
+        port = std::stoi(argv[5]);
+    } catch(std::invalid_argument& ia){
+        LOG_ERROR("listen port input error!");
+        return 1;
+    }
     HttpServer server(port, "./www");
-    if (!server.init("127.0.0.1","qingtian@localhost","hukai823","myserver",3306)) {
+    if (!server.init(argv[1],argv[2],argv[3],argv[4],3306)) {
         LOG_ERROR("http server init failed");
         return 1;
     }
     
-    LOG_INFO("http server started on port=" + std::to_string(port));
     server.run();
     return 0;
 }
