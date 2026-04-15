@@ -45,6 +45,6 @@
 
 ### 编译
 
-git clone https://github.com/你的ID/myhttp_server.git
-cd TinyHttpServer
+git clone https://github.com/qingtian1753/myhttp_server.git
+cd myhttp_server
 make
