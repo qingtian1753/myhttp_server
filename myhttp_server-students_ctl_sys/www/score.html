@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>学生管理系统 - 成绩管理</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="dashboard-body premium-dashboard-body">
+  <div class="dashboard-decor dashboard-decor-1"></div>
+  <div class="dashboard-decor dashboard-decor-2"></div>
+
+  <div class="layout premium-layout score-layout">
+    <aside class="sidebar premium-sidebar">
+      <div>
+        <div class="logo">SMS</div>
+        <h2>成绩管理</h2>
+        <p class="sidebar-text">查看、添加、修改、删除课程成绩</p>
+
+        <div class="sidebar-menu">
+          <div class="menu-item">学生信息管理</div>
+          <div class="menu-item active">成绩详情管理</div>
+          <div class="menu-item">课程筛选</div>
+          <div class="menu-item">成绩维护</div>
+        </div>
+      </div>
+
+      <div class="sidebar-bottom-card">
+        <p id="studentSummary">当前学生：-</p>
+        <p id="studentClassSummary">班级：-</p>
+        <button id="backBtn" class="ghost-btn full-btn">返回学生列表</button>
+      </div>
+    </aside>
+
+    <main class="main-content premium-main-content">
+      <header class="topbar premium-topbar">
+        <div>
+          <div class="crumb">后台首页 / 学生管理 / 成绩管理</div>
+          <h1>学生成绩管理</h1>
+          <p>支持课程筛选、新增成绩、修改成绩、删除成绩</p>
+        </div>
+        <button id="addCourseBtn" class="primary-btn glossy-btn">＋ 新增成绩</button>
+      </header>
+
+      <section class="panel search-panel premium-panel">
+        <div class="section-title-row">
+          <div>
+            <h3>课程筛选</h3>
+            <p>可按课程名过滤当前学生的成绩列表</p>
+          </div>
+        </div>
+
+        <div class="search-grid premium-search-grid score-search-grid">
+          <div class="form-item compact with-icon">
+            <label for="searchCourseName">课程名</label>
+            <div class="input-shell">
+              <span class="input-icon">📘</span>
+              <input id="searchCourseName" type="text" placeholder="请输入课程名" />
+            </div>
+          </div>
+          <div class="search-actions premium-search-actions">
+            <button id="searchCourseBtn" class="primary-btn glossy-btn" type="button">搜索</button>
+            <button id="resetCourseBtn" class="ghost-btn soft-btn" type="button">重置</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel table-panel premium-panel">
+        <div class="section-title-row">
+          <div>
+            <h3>成绩列表</h3>
+            <p id="scoreSubTitle">当前学号：-</p>
+            <p id="studentMetaLine">姓名：-　　班级：-</p>
+          </div>
+        </div>
+
+        <div class="table-wrapper premium-table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>课程名称</th>
+                <th>课程成绩</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="scoreTableBody">
+              <tr>
+                <td colspan="3" class="empty-row">正在加载数据...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="courseModal" class="modal hidden">
+    <div class="modal-mask"></div>
+    <div class="modal-dialog premium-modal-dialog score-modal">
+      <div class="modal-header">
+        <div>
+          <h3 id="courseModalTitle">新增成绩</h3>
+          <p class="modal-subtitle">请填写课程名称和成绩</p>
+        </div>
+        <button id="closeCourseModalBtn" class="icon-btn" type="button">×</button>
+      </div>
+
+      <form id="courseForm" class="modal-form">
+        <div class="form-grid">
+          <div class="form-item with-icon">
+            <label for="courseName">课程名称</label>
+            <div class="input-shell">
+              <span class="input-icon">📘</span>
+              <input id="courseName" type="text" required />
+            </div>
+          </div>
+          <div class="form-item with-icon">
+            <label for="courseScore">课程成绩</label>
+            <div class="input-shell">
+              <span class="input-icon">📝</span>
+              <input id="courseScore" type="number" min="0" max="100" required />
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button class="ghost-btn soft-btn" id="cancelCourseModalBtn" type="button">取消</button>
+          <button class="primary-btn glossy-btn" type="submit">保存</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="score.js"></script>
+</body>
+</html>

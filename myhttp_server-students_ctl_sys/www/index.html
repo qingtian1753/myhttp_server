@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>学生管理系统 - 学生管理主页</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="dashboard-body premium-dashboard-body">
+  <div class="dashboard-decor dashboard-decor-1"></div>
+  <div class="dashboard-decor dashboard-decor-2"></div>
+
+  <div class="layout premium-layout">
+    <aside class="sidebar premium-sidebar">
+      <div>
+        <div class="logo">SMS</div>
+        <h2>学生管理系统</h2>
+        <p class="sidebar-text">简洁、清爽、偏后台管理风格</p>
+
+        <div class="sidebar-menu">
+          <div class="menu-item active">学生信息管理</div>
+          <div class="menu-item">搜索与筛选</div>
+          <div class="menu-item">分页展示</div>
+          <div class="menu-item">增删改 / 成绩</div>
+        </div>
+      </div>
+
+      <div class="sidebar-bottom-card">
+        <p>已连接你的后端接口</p>
+        <button id="logoutBtn" class="ghost-btn full-btn">退出登录</button>
+      </div>
+    </aside>
+
+    <main class="main-content premium-main-content">
+      <header class="topbar premium-topbar">
+        <div>
+          <div class="crumb">后台首页 / 学生管理</div>
+          <h1>学生信息管理</h1>
+          <p>支持统一查询、后端分页、新增、编辑、删除、成绩管理</p>
+        </div>
+        <button id="addStudentBtn" class="primary-btn glossy-btn">＋ 新增学生</button>
+      </header>
+
+      <section class="panel search-panel premium-panel">
+        <div class="section-title-row">
+          <div>
+            <h3>条件筛选</h3>
+            <p>可按学号、姓名、班级快速查询</p>
+          </div>
+        </div>
+
+        <div class="search-grid premium-search-grid">
+          <div class="form-item compact with-icon">
+            <label for="searchStudentNo">学号</label>
+            <div class="input-shell">
+              <span class="input-icon">#</span>
+              <input id="searchStudentNo" type="text" placeholder="请输入学号" />
+            </div>
+          </div>
+          <div class="form-item compact with-icon">
+            <label for="searchName">姓名</label>
+            <div class="input-shell">
+              <span class="input-icon">👤</span>
+              <input id="searchName" type="text" placeholder="请输入姓名" />
+            </div>
+          </div>
+          <div class="form-item compact with-icon">
+            <label for="searchClass">班级</label>
+            <div class="input-shell">
+              <span class="input-icon">🏫</span>
+              <input id="searchClass" type="text" placeholder="请输入班级" />
+            </div>
+          </div>
+          <div class="search-actions premium-search-actions">
+            <button id="searchBtn" class="primary-btn glossy-btn" type="button">搜索</button>
+            <button id="resetBtn" class="ghost-btn soft-btn" type="button">重置</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel table-panel premium-panel">
+        <div class="section-title-row">
+          <div>
+            <h3>学生列表</h3>
+            <p>支持按学号、姓名、班级筛选，并使用后端分页返回结果</p>
+          </div>
+        </div>
+
+        <div class="table-wrapper premium-table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>学号</th>
+                <th>姓名</th>
+                <th>班级</th>
+                <th>年龄</th>
+                <th>性别</th>
+                <th>注册时间</th>
+                <th>上次修改时间</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="studentTableBody">
+              <tr>
+                <td colspan="8" class="empty-row">正在加载数据...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="pagination premium-pagination">
+          <button id="prevPageBtn" class="ghost-btn soft-btn" type="button">上一页</button>
+          <span id="pageInfo">第 1 页</span>
+          <button id="nextPageBtn" class="ghost-btn soft-btn" type="button">下一页</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="studentModal" class="modal hidden">
+    <div class="modal-mask"></div>
+    <div class="modal-dialog premium-modal-dialog">
+      <div class="modal-header">
+        <div>
+          <h3 id="modalTitle">新增学生</h3>
+          <p class="modal-subtitle">请填写完整学生信息</p>
+        </div>
+        <button id="closeModalBtn" class="icon-btn" type="button">×</button>
+      </div>
+
+      <form id="studentForm" class="modal-form">
+        <input id="studentId" type="hidden" />
+
+        <div class="form-grid">
+          <div class="form-item with-icon">
+            <label for="studentNo">学号</label>
+            <div class="input-shell">
+              <span class="input-icon">#</span>
+              <input id="studentNo" type="text" required />
+            </div>
+          </div>
+          <div class="form-item with-icon">
+            <label for="studentName">姓名</label>
+            <div class="input-shell">
+              <span class="input-icon">👤</span>
+              <input id="studentName" type="text" required />
+            </div>
+          </div>
+          <div class="form-item with-icon">
+            <label for="studentClass">班级</label>
+            <div class="input-shell">
+              <span class="input-icon">🏫</span>
+              <input id="studentClass" type="text" required />
+            </div>
+          </div>
+          <div class="form-item with-icon">
+            <label for="studentAge">年龄</label>
+            <div class="input-shell">
+              <span class="input-icon">🎂</span>
+              <input id="studentAge" type="number" min="1" max="100" required />
+            </div>
+          </div>
+          <div class="form-item with-icon full-span">
+            <label for="studentGender">性别</label>
+            <div class="input-shell select-shell">
+              <span class="input-icon">⚧</span>
+              <select id="studentGender" required>
+                <option value="">请选择</option>
+                <option value="男">男</option>
+                <option value="女">女</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button class="ghost-btn soft-btn" id="cancelModalBtn" type="button">取消</button>
+          <button class="primary-btn glossy-btn" type="submit">保存</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="index.js"></script>
+</body>
+</html>
